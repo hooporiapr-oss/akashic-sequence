@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akashic Sequence - Memory Training</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1034 50%, #2d1b4e 100%);
+            min-height: 100vh;
+            color: #e8e8f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .title {
+            font-size: 3em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffd700, #ff8c00, #8a2be2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: 4px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #d4af37;
+            font-size: 1.2em;
+            font-style: italic;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .user-bar {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .user-bar span {
+            color: #d4af37;
+            font-size: 0.95em;
+        }
+
+        .user-bar strong {
+            color: #ffd700;
+        }
+
+        .user-bar button {
+            background: linear-gradient(135deg, #8a2be2, #4b0082);
+            color: #fff;
+            border: none;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-left: 15px;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 3px solid rgba(212, 175, 55, 0.5);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .sequence-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .sequence-box {
+            aspect-ratio: 1;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sequence-box::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            height: 60%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent);
+        }
+
+        .sequence-box:hover:not(.disabled) {
+            transform: scale(1.05);
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+
+        .sequence-box:active:not(.disabled) {
+            transform: scale(0.95);
+        }
+
+        .sequence-box.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 40px currentColor;
+            border-color: #fff;
+        }
+
+        .sequence-box.disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .sequence-box.wrong {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Color themes */
+        .box-red { background: linear-gradient(135deg, #ff6b6b, #c92a2a); color: #ff6b6b; }
+        .box-blue { background: linear-gradient(135deg, #4ecdc4, #0984e3); color: #4ecdc4; }
+        .box-green { background: linear-gradient(135deg, #51cf66, #2f9e44); color: #51cf66; }
+        .box-yellow { background: linear-gradient(135deg, #ffd43b, #fab005); color: #ffd43b; }
+        .box-purple { background: linear-gradient(135deg, #b197fc, #7950f2); color: #b197fc; }
+        .box-orange { background: linear-gradient(135deg, #ff922b, #e8590c); color: #ff922b; }
+        .box-pink { background: linear-gradient(135deg, #ff6b9d, #e64980); color: #ff6b9d; }
+        .box-cyan { background: linear-gradient(135deg, #3bc9db, #1098ad); color: #3bc9db; }
+        .box-teal { background: linear-gradient(135deg, #20c997, #12b886); color: #20c997; }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .stat-label {
+            color: #b8b8cc;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .message {
+            text-align: center;
+            font-size: 1.3em;
+            color: #ffd700;
+            margin: 20px 0;
+            min-height: 40px;
+            font-weight: bold;
+        }
+
+        .message.error {
+            color: #ff6b6b;
+        }
+
+        .message.success {
+            color: #51cf66;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #1a1034;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.6);
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .difficulty-btn {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 10px;
+            color: #d4af37;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+        }
+
+        .difficulty-btn:hover {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .difficulty-btn.active {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #1a1034;
+            border-color: #ffd700;
+        }
+
+        .game-over {
+            background: rgba(10, 14, 39, 0.95);
+            border: 3px solid #ffd700;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .game-over.show {
+            display: block;
+        }
+
+        .game-over h3 {
+            color: #ffd700;
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .game-over p {
+            color: #c4c4d8;
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+
+        .instructions {
+            background: rgba(138, 43, 226, 0.1);
+            border: 2px solid rgba(138, 43, 226, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .instructions h4 {
+            color: #8a2be2;
+            margin-bottom: 10px;
+        }
+
+        .instructions p {
+            color: #c4c4d8;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2em;
+            }
+            .game-container {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="title">🧠 Akashic Sequence</div>
+    <div class="subtitle">Memory & Pattern Recognition Training</div>
+    
+    <div class="user-bar">
+        <span>Player: <strong id="currentUsername">Guest</strong></span>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <div class="game-container">
+        <div class="difficulty-selector">
+            <button class="difficulty-btn active" onclick="setDifficulty('easy')">Easy</button>
+            <button class="difficulty-btn" onclick="setDifficulty('medium')">Medium</button>
+            <button class="difficulty-btn" onclick="setDifficulty('hard')">Hard</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="level">1</div>
+                <div class="stat-label">Level</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="highScore">0</div>
+                <div class="stat-label">Best</div>
+            </div>
+        </div>
+
+        <div class="message" id="message">Watch the sequence!</div>
+
+        <div class="sequence-grid" id="sequenceGrid">
+            <!-- Boxes will be generated by JavaScript -->
+        </div>
+
+        <button class="button" id="startBtn" onclick="startGame()">Start Game</button>
+
+        <div class="game-over" id="gameOver">
+            <h3>Game Over!</h3>
+            <p id="finalLevel"></p>
+            <p id="finalScore"></p>
+            <button class="button" onclick="startGame()">Play Again</button>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h4>How to Play</h4>
+        <p>
+            <strong>Watch</strong> the sequence light up<br>
+            <strong>Remember</strong> the order<br>
+            <strong>Repeat</strong> by clicking in the same order<br>
+            Each level adds one more step!
+        </p>
+    </div>
+
+    <script>
+        // Auth check
+        function getCurrentUser() {
+            const user = localStorage.getItem('sequence_current_user');
+            return user ? JSON.parse(user) : null;
+        }
+
+        function checkAuth() {
+            const currentUser = getCurrentUser();
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            document.getElementById('currentUsername').textContent = currentUser.username;
+            
+            // Load user's high score
+            highScore = currentUser.stats.highScore || 0;
+            updateDisplay();
+            
+            return true;
+        }
+
+        function updateUserStats(gameStats) {
+            const currentUser = getCurrentUser();
+            if (!currentUser) return;
+
+            const users = JSON.parse(localStorage.getItem('sequence_users') || '[]');
+            const userIndex = users.findIndex(u => u.username === currentUser.username);
+            
+            if (userIndex !== -1) {
+                users[userIndex].stats.gamesPlayed++;
+                users[userIndex].stats.totalScore += gameStats.score;
+                
+                if (gameStats.level > users[userIndex].stats.highestLevel) {
+                    users[userIndex].stats.highestLevel = gameStats.level;
+                }
+                
+                if (gameStats.score > users[userIndex].stats.highScore) {
+                    users[userIndex].stats.highScore = gameStats.score;
+                }
+
+                localStorage.setItem('sequence_users', JSON.stringify(users));
+                
+                const updatedUser = { ...users[userIndex] };
+                delete updatedUser.password;
+                localStorage.setItem('sequence_current_user', JSON.stringify(updatedUser));
+            }
+        }
+
+        function logout() {
+            if (confirm('Logout and return to login screen?')) {
+                localStorage.removeItem('sequence_current_user');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Check auth on load
+        if (!checkAuth()) {
+            // Redirects to login
+        }
+
+        // Game code
+        let sequence = [];
+        let playerSequence = [];
+        let level = 1;
+        let score = 0;
+        let highScore = 0;
+        let gameActive = false;
+        let isShowingSequence = false;
+        let difficulty = 'easy';
+        
+        const boxCount = 9;
+        const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan', 'teal'];
+        
+        const speeds = {
+            easy: { show: 800, gap: 400 },
+            medium: { show: 600, gap: 300 },
+            hard: { show: 400, gap: 200 }
+        };
+
+        function initGrid() {
+            const grid = document.getElementById('sequenceGrid');
+            grid.innerHTML = '';
+            
+            for (let i = 0; i < boxCount; i++) {
+                const box = document.createElement('div');
+                box.className = `sequence-box box-${colors[i]}`;
+                box.dataset.index = i;
+                box.onclick = () => handleBoxClick(i);
+                grid.appendChild(box);
+            }
+        }
+
+        function setDifficulty(diff) {
+            difficulty = diff;
+            document.querySelectorAll('.difficulty-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function updateDisplay() {
+            document.getElementById('level').textContent = level;
+            document.getElementById('score').textContent = score;
+            document.getElementById('highScore').textContent = highScore;
+        }
+
+        function showMessage(text, type = '') {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.className = 'message ' + type;
+        }
+
+        function startGame() {
+            sequence = [];
+            playerSequence = [];
+            level = 1;
+            score = 0;
+            gameActive = true;
+            
+            document.getElementById('gameOver').classList.remove('show');
+            document.getElementById('startBtn').disabled = true;
+            
+            updateDisplay();
+            nextLevel();
+        }
+
+        function nextLevel() {
+            playerSequence = [];
+            addToSequence();
+            showMessage(`Level ${level} - Watch carefully!`);
+            
+            setTimeout(() => {
+                playSequence();
+            }, 1000);
+        }
+
+        function addToSequence() {
+            const randomIndex = Math.floor(Math.random() * boxCount);
+            sequence.push(randomIndex);
+        }
+
+        async function playSequence() {
+            isShowingSequence = true;
+            disableBoxes(true);
+            
+            for (let i = 0; i < sequence.length; i++) {
+                await sleep(speeds[difficulty].gap);
+                await lightUpBox(sequence[i]);
+            }
+            
+            isShowingSequence = false;
+            disableBoxes(false);
+            showMessage('Your turn! Repeat the sequence');
+        }
+
+        function lightUpBox(index) {
+            return new Promise((resolve) => {
+                const box = document.querySelector(`[data-index="${index}"]`);
+                box.classList.add('active');
+                
+                setTimeout(() => {
+                    box.classList.remove('active');
+                    resolve();
+                }, speeds[difficulty].show);
+            });
+        }
+
+        function handleBoxClick(index) {
+            if (!gameActive || isShowingSequence) return;
+            
+            playerSequence.push(index);
+            lightUpBox(index);
+            
+            const currentIndex = playerSequence.length - 1;
+            if (playerSequence[currentIndex] !== sequence[currentIndex]) {
+                gameOver(false);
+                return;
+            }
+            
+            if (playerSequence.length === sequence.length) {
+                score += level * 10;
+                level++;
+                updateDisplay();
+                
+                showMessage('Correct! 🎉', 'success');
+                disableBoxes(true);
+                
+                setTimeout(() => {
+                    nextLevel();
+                }, 1500);
+            }
+        }
+
+        function disableBoxes(disabled) {
+            document.querySelectorAll('.sequence-box').forEach(box => {
+                if (disabled) {
+                    box.classList.add('disabled');
+                } else {
+                    box.classList.remove('disabled');
+                }
+            });
+        }
+
+        function gameOver(won) {
+            gameActive = false;
+            isShowingSequence = false;
+            
+            if (!won) {
+                showMessage('Wrong sequence! Game Over', 'error');
+                
+                if (playerSequence.length > 0) {
+                    const wrongIndex = playerSequence[playerSequence.length - 1];
+                    const wrongBox = document.querySelector(`[data-index="${wrongIndex}"]`);
+                    wrongBox.classList.add('wrong');
+                    setTimeout(() => wrongBox.classList.remove('wrong'), 500);
+                }
+            }
+            
+            // Update user stats
+            updateUserStats({
+                score: score,
+                level: level,
+                won: won
+            });
+            
+            if (score > highScore) {
+                highScore = score;
+            }
+            
+            updateDisplay();
+            
+            document.getElementById('finalLevel').textContent = `Reached Level ${level}`;
+            document.getElementById('finalScore').textContent = `Final Score: ${score}`;
+            
+            setTimeout(() => {
+                document.getElementById('gameOver').classList.add('show');
+                document.getElementById('startBtn').disabled = false;
+            }, 1000);
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Initialize
+        initGrid();
+        updateDisplay();
+    </script>
+</body>
+</html>
