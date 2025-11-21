@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Akashic Sequence - Login</title>
+    <title>Akashic Sequence</title>
     <style>
         * {
             margin: 0;
@@ -40,20 +40,25 @@
             font-size: 1.2em;
             font-style: italic;
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
-        .auth-container {
+        .container {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
-            border: 2px solid rgba(212, 175, 55, 0.3);
+            border: 3px solid rgba(212, 175, 55, 0.5);
             border-radius: 20px;
             padding: 40px;
             width: 100%;
-            max-width: 450px;
+            max-width: 600px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
         }
 
+        .hidden {
+            display: none !important;
+        }
+
+        /* Login/Register Styles */
         .form-group {
             margin-bottom: 20px;
         }
@@ -94,6 +99,7 @@
             cursor: pointer;
             font-family: 'Georgia', serif;
             margin-top: 10px;
+            transition: all 0.3s ease;
         }
 
         .button:hover {
@@ -101,41 +107,55 @@
             box-shadow: 0 8px 30px rgba(255, 215, 0, 0.6);
         }
 
+        .button.secondary {
+            background: linear-gradient(135deg, #8a2be2, #4b0082);
+            color: #fff;
+        }
+
         .toggle-text {
             text-align: center;
             margin-top: 20px;
             color: #b8b8cc;
+            font-size: 0.95em;
         }
 
         .toggle-link {
             color: #ffd700;
             cursor: pointer;
             text-decoration: underline;
+            font-weight: bold;
         }
 
-        .message {
+        .toggle-link:hover {
+            color: #ff8c00;
+        }
+
+        .error-msg {
+            background: rgba(255, 70, 70, 0.2);
+            border: 2px solid #ff4646;
+            color: #ffaaaa;
             padding: 12px;
             border-radius: 10px;
             margin-bottom: 20px;
             text-align: center;
-            display: none;
         }
 
-        .message.error {
-            background: rgba(255, 70, 70, 0.2);
-            border: 2px solid #ff4646;
-            color: #ffaaaa;
+        /* Dashboard Styles */
+        .welcome-box {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
-        .message.show {
-            display: block;
+        .welcome-box h3 {
+            color: #ffd700;
+            margin-bottom: 5px;
         }
 
-        .hidden {
-            display: none;
-        }
-
-        .user-stats {
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
@@ -162,18 +182,163 @@
             margin-top: 5px;
         }
 
-        .welcome-box {
-            background: rgba(255, 215, 0, 0.1);
-            border: 2px solid rgba(255, 215, 0, 0.3);
-            border-radius: 15px;
-            padding: 20px;
+        /* Game Styles */
+        .user-bar {
+            text-align: center;
             margin-bottom: 20px;
+            color: #d4af37;
+        }
+
+        .user-bar strong {
+            color: #ffd700;
+        }
+
+        .sequence-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .sequence-box {
+            aspect-ratio: 1;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 3px solid transparent;
+            position: relative;
+        }
+
+        .sequence-box:hover:not(.disabled) {
+            transform: scale(1.05);
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+
+        .sequence-box.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 40px currentColor;
+            border-color: #fff;
+        }
+
+        .sequence-box.disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .sequence-box.wrong {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .box-red { background: linear-gradient(135deg, #ff6b6b, #c92a2a); color: #ff6b6b; }
+        .box-blue { background: linear-gradient(135deg, #4ecdc4, #0984e3); color: #4ecdc4; }
+        .box-green { background: linear-gradient(135deg, #51cf66, #2f9e44); color: #51cf66; }
+        .box-yellow { background: linear-gradient(135deg, #ffd43b, #fab005); color: #ffd43b; }
+        .box-purple { background: linear-gradient(135deg, #b197fc, #7950f2); color: #b197fc; }
+        .box-orange { background: linear-gradient(135deg, #ff922b, #e8590c); color: #ff922b; }
+        .box-pink { background: linear-gradient(135deg, #ff6b9d, #e64980); color: #ff6b9d; }
+        .box-cyan { background: linear-gradient(135deg, #3bc9db, #1098ad); color: #3bc9db; }
+        .box-teal { background: linear-gradient(135deg, #20c997, #12b886); color: #20c997; }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+
+        .game-stat {
             text-align: center;
         }
 
-        .welcome-box h3 {
+        .game-stat-value {
+            font-size: 2em;
             color: #ffd700;
-            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .game-stat-label {
+            color: #b8b8cc;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        .message {
+            text-align: center;
+            font-size: 1.2em;
+            color: #ffd700;
+            margin: 20px 0;
+            min-height: 35px;
+            font-weight: bold;
+        }
+
+        .message.error {
+            color: #ff6b6b;
+        }
+
+        .message.success {
+            color: #51cf66;
+        }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .difficulty-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 10px;
+            color: #d4af37;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            transition: all 0.3s ease;
+        }
+
+        .difficulty-btn:hover {
+            border-color: #ffd700;
+        }
+
+        .difficulty-btn.active {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #1a1034;
+            border-color: #ffd700;
+        }
+
+        .game-over {
+            background: rgba(10, 14, 39, 0.95);
+            border: 3px solid #ffd700;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .game-over h3 {
+            color: #ffd700;
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .game-over p {
+            color: #c4c4d8;
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 768px) {
+            .title { font-size: 2em; }
+            .container { padding: 25px; }
         }
     </style>
 </head>
@@ -181,209 +346,221 @@
     <div class="title">🧠 Akashic Sequence</div>
     <div class="subtitle">Memory & Pattern Recognition Training</div>
 
-    <!-- Login Form -->
-    <div class="auth-container" id="loginContainer">
+    <!-- Login Screen -->
+    <div class="container" id="loginScreen">
         <h2 style="color: #ffd700; margin-bottom: 25px; text-align: center;">Login</h2>
-        
-        <div class="message error" id="loginError"></div>
-        
-        <form onsubmit="handleLogin(event)">
+        <div id="loginError" class="error-msg hidden"></div>
+        <form id="loginForm">
             <div class="form-group">
                 <label>Username</label>
                 <input type="text" id="loginUsername" required>
             </div>
-            
             <div class="form-group">
                 <label>Password</label>
                 <input type="password" id="loginPassword" required>
             </div>
-            
             <button type="submit" class="button">Login</button>
         </form>
-        
         <div class="toggle-text">
-            Don't have an account? <span class="toggle-link" onclick="showRegister()">Register here</span>
+            Don't have an account? <span class="toggle-link" id="showRegisterLink">Register here</span>
         </div>
     </div>
 
-    <!-- Registration Form -->
-    <div class="auth-container hidden" id="registerContainer">
+    <!-- Register Screen -->
+    <div class="container hidden" id="registerScreen">
         <h2 style="color: #ffd700; margin-bottom: 25px; text-align: center;">Create Account</h2>
-        
-        <div class="message error" id="registerError"></div>
-        
-        <form onsubmit="handleRegister(event)">
+        <div id="registerError" class="error-msg hidden"></div>
+        <form id="registerForm">
             <div class="form-group">
                 <label>Username</label>
                 <input type="text" id="registerUsername" required minlength="3">
             </div>
-            
             <div class="form-group">
                 <label>Password</label>
                 <input type="password" id="registerPassword" required minlength="6">
             </div>
-            
             <div class="form-group">
                 <label>Confirm Password</label>
                 <input type="password" id="confirmPassword" required>
             </div>
-            
             <button type="submit" class="button">Create Account</button>
         </form>
-        
         <div class="toggle-text">
-            Already have an account? <span class="toggle-link" onclick="showLogin()">Login here</span>
+            Already have an account? <span class="toggle-link" id="showLoginLink">Login here</span>
         </div>
     </div>
 
-    <!-- Dashboard -->
-    <div class="auth-container hidden" id="dashboardContainer">
+    <!-- Dashboard Screen -->
+    <div class="container hidden" id="dashboardScreen">
         <div class="welcome-box">
-            <h3>Welcome, <span id="displayUsername"></span>! 👋</h3>
+            <h3>Welcome, <span id="dashboardUsername"></span>! 👋</h3>
             <p style="color: #b8b8cc; margin-top: 5px;">Ready to test your memory?</p>
         </div>
 
-        <div class="user-stats">
+        <div class="stats-grid">
             <div class="stat-box">
-                <div class="stat-value" id="gamesPlayed">0</div>
+                <div class="stat-value" id="dashGamesPlayed">0</div>
                 <div class="stat-label">Games Played</div>
             </div>
             <div class="stat-box">
-                <div class="stat-value" id="highScore">0</div>
+                <div class="stat-value" id="dashHighScore">0</div>
                 <div class="stat-label">High Score</div>
             </div>
             <div class="stat-box">
-                <div class="stat-value" id="highestLevel">0</div>
+                <div class="stat-value" id="dashHighestLevel">0</div>
                 <div class="stat-label">Highest Level</div>
             </div>
             <div class="stat-box">
-                <div class="stat-value" id="avgScore">0</div>
+                <div class="stat-value" id="dashAvgScore">0</div>
                 <div class="stat-label">Avg Score</div>
             </div>
         </div>
 
-        <button class="button" onclick="startGame()">
-            🎮 Start Playing
-        </button>
-        
-        <button class="button" onclick="logout()" style="background: linear-gradient(135deg, #8a2be2, #4b0082); color: #fff; margin-top: 15px;">
-            Logout
-        </button>
+        <button class="button" id="startPlayingBtn">🎮 Start Playing</button>
+        <button class="button secondary" id="dashLogoutBtn">Logout</button>
+    </div>
+
+    <!-- Game Screen -->
+    <div class="container hidden" id="gameScreen">
+        <div class="user-bar">
+            Player: <strong id="gameUsername"></strong>
+            <button class="button secondary" id="gameLogoutBtn" style="display: inline-block; width: auto; padding: 6px 18px; font-size: 0.9em; margin-left: 15px;">
+                Logout
+            </button>
+        </div>
+
+        <div class="difficulty-selector">
+            <button class="difficulty-btn active" data-difficulty="easy">Easy</button>
+            <button class="difficulty-btn" data-difficulty="medium">Medium</button>
+            <button class="difficulty-btn" data-difficulty="hard">Hard</button>
+        </div>
+
+        <div class="game-stats">
+            <div class="game-stat">
+                <div class="game-stat-value" id="levelDisplay">1</div>
+                <div class="game-stat-label">Level</div>
+            </div>
+            <div class="game-stat">
+                <div class="game-stat-value" id="scoreDisplay">0</div>
+                <div class="game-stat-label">Score</div>
+            </div>
+            <div class="game-stat">
+                <div class="game-stat-value" id="bestDisplay">0</div>
+                <div class="game-stat-label">Best</div>
+            </div>
+        </div>
+
+        <div class="message" id="gameMessage">Watch the sequence!</div>
+
+        <div class="sequence-grid" id="sequenceGrid"></div>
+
+        <button class="button" id="startGameBtn">Start Game</button>
+
+        <div class="game-over hidden" id="gameOverScreen">
+            <h3>Game Over!</h3>
+            <p id="finalLevel"></p>
+            <p id="finalScore"></p>
+            <button class="button" id="playAgainBtn">Play Again</button>
+        </div>
     </div>
 
     <script>
-        // User management
+        // ==================== USER MANAGEMENT ====================
+        const STORAGE_USERS = 'seq_users';
+        const STORAGE_CURRENT = 'seq_current_user';
+
         function getUsers() {
-            const users = localStorage.getItem('sequence_users');
-            return users ? JSON.parse(users) : [];
+            return JSON.parse(localStorage.getItem(STORAGE_USERS) || '[]');
         }
 
         function saveUsers(users) {
-            localStorage.setItem('sequence_users', JSON.stringify(users));
+            localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
         }
 
         function getCurrentUser() {
-            const user = localStorage.getItem('sequence_current_user');
-            return user ? JSON.parse(user) : null;
+            return JSON.parse(localStorage.getItem(STORAGE_CURRENT) || 'null');
         }
 
         function setCurrentUser(user) {
-            localStorage.setItem('sequence_current_user', JSON.stringify(user));
+            localStorage.setItem(STORAGE_CURRENT, JSON.stringify(user));
         }
 
         function clearCurrentUser() {
-            localStorage.removeItem('sequence_current_user');
+            localStorage.removeItem(STORAGE_CURRENT);
         }
 
-        // Hash function
-        function simpleHash(str) {
+        function hashPassword(password) {
             let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                const char = str.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
+            for (let i = 0; i < password.length; i++) {
+                hash = ((hash << 5) - hash) + password.charCodeAt(i);
                 hash = hash & hash;
             }
             return hash.toString(36);
         }
 
-        // Show/hide forms
-        function showLogin() {
-            document.getElementById('loginContainer').classList.remove('hidden');
-            document.getElementById('registerContainer').classList.add('hidden');
-            document.getElementById('dashboardContainer').classList.add('hidden');
-            clearMessages();
-        }
-
-        function showRegister() {
-            document.getElementById('loginContainer').classList.add('hidden');
-            document.getElementById('registerContainer').classList.remove('hidden');
-            document.getElementById('dashboardContainer').classList.add('hidden');
-            clearMessages();
-        }
-
-        function showDashboard() {
-            document.getElementById('loginContainer').classList.add('hidden');
-            document.getElementById('registerContainer').classList.add('hidden');
-            document.getElementById('dashboardContainer').classList.remove('hidden');
-            loadUserStats();
-        }
-
-        function clearMessages() {
-            document.querySelectorAll('.message').forEach(el => {
-                el.classList.remove('show');
-                el.textContent = '';
-            });
+        // ==================== SCREEN MANAGEMENT ====================
+        function showScreen(screenId) {
+            document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
+            document.getElementById(screenId).classList.remove('hidden');
         }
 
         function showError(elementId, message) {
-            const element = document.getElementById(elementId);
-            element.textContent = message;
-            element.classList.add('show');
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.classList.remove('hidden');
         }
 
-        // Handle registration
-        function handleRegister(event) {
-            event.preventDefault();
-            clearMessages();
+        function hideError(elementId) {
+            document.getElementById(elementId).classList.add('hidden');
+        }
+
+        // ==================== LOGIN/REGISTER ====================
+        document.getElementById('showRegisterLink').addEventListener('click', () => {
+            hideError('loginError');
+            showScreen('registerScreen');
+        });
+
+        document.getElementById('showLoginLink').addEventListener('click', () => {
+            hideError('registerError');
+            showScreen('loginScreen');
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            hideError('registerError');
 
             const username = document.getElementById('registerUsername').value.trim();
             const password = document.getElementById('registerPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
 
-            if (password !== confirmPassword) {
+            if (password !== confirm) {
                 showError('registerError', 'Passwords do not match!');
                 return;
             }
 
             const users = getUsers();
-
-            if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+            if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
                 showError('registerError', 'Username already exists!');
                 return;
             }
 
             const newUser = {
                 username: username,
-                password: simpleHash(password),
-                stats: {
-                    gamesPlayed: 0,
-                    highScore: 0,
-                    highestLevel: 0,
-                    totalScore: 0
-                }
+                password: hashPassword(password),
+                stats: { gamesPlayed: 0, highScore: 0, highestLevel: 0, totalScore: 0 }
             };
 
             users.push(newUser);
             saveUsers(users);
 
-            alert('Account created! Please login.');
-            showLogin();
-        }
+            alert('Account created successfully! Please login.');
+            document.getElementById('registerForm').reset();
+            showScreen('loginScreen');
+        });
 
-        // Handle login
-        function handleLogin(event) {
-            event.preventDefault();
-            clearMessages();
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            hideError('loginError');
 
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
@@ -391,55 +568,249 @@
             const users = getUsers();
             const user = users.find(u => 
                 u.username.toLowerCase() === username.toLowerCase() &&
-                u.password === simpleHash(password)
+                u.password === hashPassword(password)
             );
 
-            if (user) {
-                const userSession = { ...user };
-                delete userSession.password;
-                setCurrentUser(userSession);
-                
-                document.getElementById('displayUsername').textContent = user.username;
-                showDashboard();
-            } else {
+            if (!user) {
                 showError('loginError', 'Invalid username or password!');
+                return;
             }
-        }
 
-        // Load user stats
-        function loadUserStats() {
+            setCurrentUser(user);
+            document.getElementById('loginForm').reset();
+            loadDashboard();
+        });
+
+        // ==================== DASHBOARD ====================
+        function loadDashboard() {
             const user = getCurrentUser();
-            if (!user) return;
-
-            document.getElementById('gamesPlayed').textContent = user.stats.gamesPlayed;
-            document.getElementById('highScore').textContent = user.stats.highScore;
-            document.getElementById('highestLevel').textContent = user.stats.highestLevel;
-            
-            const avgScore = user.stats.gamesPlayed > 0 
-                ? Math.round(user.stats.totalScore / user.stats.gamesPlayed)
-                : 0;
-            document.getElementById('avgScore').textContent = avgScore;
-        }
-
-        // Logout
-        function logout() {
-            clearCurrentUser();
-            showLogin();
-        }
-
-        // Start game
-        function startGame() {
-            window.location.href = 'game.html';
-        }
-
-        // Check if user is already logged in
-        window.onload = function() {
-            const currentUser = getCurrentUser();
-            if (currentUser) {
-                document.getElementById('displayUsername').textContent = currentUser.username;
-                showDashboard();
+            if (!user) {
+                showScreen('loginScreen');
+                return;
             }
+
+            document.getElementById('dashboardUsername').textContent = user.username;
+            document.getElementById('dashGamesPlayed').textContent = user.stats.gamesPlayed;
+            document.getElementById('dashHighScore').textContent = user.stats.highScore;
+            document.getElementById('dashHighestLevel').textContent = user.stats.highestLevel;
+            
+            const avg = user.stats.gamesPlayed > 0 
+                ? Math.round(user.stats.totalScore / user.stats.gamesPlayed) 
+                : 0;
+            document.getElementById('dashAvgScore').textContent = avg;
+
+            showScreen('dashboardScreen');
+        }
+
+        document.getElementById('startPlayingBtn').addEventListener('click', () => {
+            const user = getCurrentUser();
+            document.getElementById('gameUsername').textContent = user.username;
+            document.getElementById('bestDisplay').textContent = user.stats.highScore;
+            showScreen('gameScreen');
+        });
+
+        document.getElementById('dashLogoutBtn').addEventListener('click', () => {
+            if (confirm('Logout?')) {
+                clearCurrentUser();
+                showScreen('loginScreen');
+            }
+        });
+
+        document.getElementById('gameLogoutBtn').addEventListener('click', () => {
+            if (confirm('Logout and return to login?')) {
+                clearCurrentUser();
+                showScreen('loginScreen');
+            }
+        });
+
+        // ==================== GAME LOGIC ====================
+        let sequence = [];
+        let playerSequence = [];
+        let level = 1;
+        let score = 0;
+        let gameActive = false;
+        let isShowingSequence = false;
+        let difficulty = 'easy';
+
+        const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan', 'teal'];
+        const speeds = {
+            easy: { show: 800, gap: 400 },
+            medium: { show: 600, gap: 300 },
+            hard: { show: 400, gap: 200 }
         };
+
+        // Initialize grid
+        function initGrid() {
+            const grid = document.getElementById('sequenceGrid');
+            grid.innerHTML = '';
+            colors.forEach((color, i) => {
+                const box = document.createElement('div');
+                box.className = `sequence-box box-${color}`;
+                box.dataset.index = i;
+                box.addEventListener('click', () => handleBoxClick(i));
+                grid.appendChild(box);
+            });
+        }
+
+        // Difficulty selector
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                difficulty = btn.dataset.difficulty;
+            });
+        });
+
+        function updateGameDisplay() {
+            document.getElementById('levelDisplay').textContent = level;
+            document.getElementById('scoreDisplay').textContent = score;
+        }
+
+        function showMessage(text, type = '') {
+            const msg = document.getElementById('gameMessage');
+            msg.textContent = text;
+            msg.className = 'message ' + type;
+        }
+
+        document.getElementById('startGameBtn').addEventListener('click', startGame);
+        document.getElementById('playAgainBtn').addEventListener('click', startGame);
+
+        function startGame() {
+            sequence = [];
+            playerSequence = [];
+            level = 1;
+            score = 0;
+            gameActive = true;
+
+            document.getElementById('gameOverScreen').classList.add('hidden');
+            document.getElementById('startGameBtn').disabled = true;
+
+            updateGameDisplay();
+            nextLevel();
+        }
+
+        function nextLevel() {
+            playerSequence = [];
+            sequence.push(Math.floor(Math.random() * 9));
+            showMessage(`Level ${level} - Watch!`);
+
+            setTimeout(() => playSequence(), 1000);
+        }
+
+        async function playSequence() {
+            isShowingSequence = true;
+            disableBoxes(true);
+
+            for (let i = 0; i < sequence.length; i++) {
+                await sleep(speeds[difficulty].gap);
+                await lightUpBox(sequence[i]);
+            }
+
+            isShowingSequence = false;
+            disableBoxes(false);
+            showMessage('Your turn!');
+        }
+
+        function lightUpBox(index) {
+            return new Promise((resolve) => {
+                const box = document.querySelector(`[data-index="${index}"]`);
+                box.classList.add('active');
+                setTimeout(() => {
+                    box.classList.remove('active');
+                    resolve();
+                }, speeds[difficulty].show);
+            });
+        }
+
+        function handleBoxClick(index) {
+            if (!gameActive || isShowingSequence) return;
+
+            playerSequence.push(index);
+            lightUpBox(index);
+
+            const currentIndex = playerSequence.length - 1;
+            if (playerSequence[currentIndex] !== sequence[currentIndex]) {
+                gameOver(false);
+                return;
+            }
+
+            if (playerSequence.length === sequence.length) {
+                score += level * 10;
+                level++;
+                updateGameDisplay();
+
+                showMessage('Correct! 🎉', 'success');
+                disableBoxes(true);
+
+                setTimeout(() => nextLevel(), 1500);
+            }
+        }
+
+        function disableBoxes(disabled) {
+            document.querySelectorAll('.sequence-box').forEach(box => {
+                if (disabled) {
+                    box.classList.add('disabled');
+                } else {
+                    box.classList.remove('disabled');
+                }
+            });
+        }
+
+        function gameOver(won) {
+            gameActive = false;
+            isShowingSequence = false;
+
+            if (!won) {
+                showMessage('Wrong! Game Over', 'error');
+                if (playerSequence.length > 0) {
+                    const wrongBox = document.querySelector(`[data-index="${playerSequence[playerSequence.length - 1]}"]`);
+                    wrongBox.classList.add('wrong');
+                    setTimeout(() => wrongBox.classList.remove('wrong'), 500);
+                }
+            }
+
+            // Update user stats
+            const user = getCurrentUser();
+            if (user) {
+                const users = getUsers();
+                const userIndex = users.findIndex(u => u.username === user.username);
+                if (userIndex !== -1) {
+                    users[userIndex].stats.gamesPlayed++;
+                    users[userIndex].stats.totalScore += score;
+                    if (level > users[userIndex].stats.highestLevel) {
+                        users[userIndex].stats.highestLevel = level;
+                    }
+                    if (score > users[userIndex].stats.highScore) {
+                        users[userIndex].stats.highScore = score;
+                        document.getElementById('bestDisplay').textContent = score;
+                    }
+                    saveUsers(users);
+                    setCurrentUser(users[userIndex]);
+                }
+            }
+
+            document.getElementById('finalLevel').textContent = `Reached Level ${level}`;
+            document.getElementById('finalScore').textContent = `Final Score: ${score}`;
+
+            setTimeout(() => {
+                document.getElementById('gameOverScreen').classList.remove('hidden');
+                document.getElementById('startGameBtn').disabled = false;
+            }, 1000);
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // ==================== INITIALIZE ====================
+        initGrid();
+        
+        const currentUser = getCurrentUser();
+        if (currentUser) {
+            loadDashboard();
+        } else {
+            showScreen('loginScreen');
+        }
     </script>
 </body>
 </html>
