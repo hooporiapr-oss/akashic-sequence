@@ -803,14 +803,22 @@
         }
 
         // ==================== INITIALIZE ====================
-        initGrid();
-        
-        const currentUser = getCurrentUser();
-        if (currentUser) {
-            loadDashboard();
-        } else {
-            showScreen('loginScreen');
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded - initializing...');
+            
+            initGrid();
+            
+            const currentUser = getCurrentUser();
+            if (currentUser) {
+                console.log('User found:', currentUser.username);
+                loadDashboard();
+            } else {
+                console.log('No user - showing login');
+                showScreen('loginScreen');
+            }
+            
+            console.log('Initialization complete');
+        });
     </script>
 </body>
 </html>
